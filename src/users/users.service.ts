@@ -13,11 +13,35 @@ export class UsersService {
    * is going to tell the dependency injection system that we need user repository.
    * Use this anytime when you need a typeORM repository.
    */
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  public constructor(@InjectRepository(User) private repo: Repository<User>) {}
+
   //Create User and save to the database
-  create(email: string, password: string) {
+  public create(email: string, password: string): Promise<User> {
     //Create instance of User entity
     const user = this.repo.create({ email, password });
     return this.repo.save(user);
   }
+
+  //Return single record/row based on the query
+  public findOne(id: number): Promise<User> {
+    return this.repo.findOneBy({ id });
+  }
+
+  //Return a list of records/rows based on the query
+  public find(email: string): Promise<User[]> {
+    return this.repo.find({ where: { email } });
+  }
+
+  /**
+   * Need type defination to be very flexible to update either the email
+   * or password or both properties. User first off is a reference to our
+   * user entity. Partial is type helper in typescript, tell attrs can be
+   * any object that has at least or none some of the propertied of the User
+   * class. The object has at least one property or all the properties of User
+   * that would be consider a valid argument
+   */
+
+  public update(id: number, attrs: Partial<User>): Promise<User> {}
+
+  public remove() {}
 }

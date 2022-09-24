@@ -4,10 +4,10 @@ import { UsersService } from './users.service';
 
 @Controller('auth')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  public constructor(private userService: UsersService) {}
 
   @Post('/signup')
-  createUser(@Body() body: CreateUserDto) {
+  public createUser(@Body() body: CreateUserDto) {
     this.userService.create(body.email, body.password);
   }
 }
