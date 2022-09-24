@@ -38,10 +38,25 @@ export class UsersService {
    * user entity. Partial is type helper in typescript, tell attrs can be
    * any object that has at least or none some of the propertied of the User
    * class. The object has at least one property or all the properties of User
-   * that would be consider a valid argument
+   * that would be consider a valid argument.
    */
 
-  public update(id: number, attrs: Partial<User>): Promise<User> {}
+  public async update(id: number, attrs: Partial<User>): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    //Take all the properties from attrs and copy them directly to the user
+    //overriding any properties that is already in the user object
+    Object.assign(user, attrs);
+    return this.repo.save(user);
+  }
 
-  public remove() {}
+  public async remove(id: number): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.repo.remove(user);
+  }
 }
