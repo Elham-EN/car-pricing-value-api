@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 //Hook up the User Repository to the User Service
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,8 +23,14 @@ export class UsersService {
   }
 
   //Return single record/row based on the query
-  public findOne(id: number): Promise<User> {
-    return this.repo.findOneBy({ id });
+  public async findOne(id: number): Promise<User> {
+    const user = await this.repo.findOneBy({ id });
+    console.log('debug:', user);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   //Return a list of records/rows based on the query
@@ -44,7 +50,7 @@ export class UsersService {
   public async update(id: number, attrs: Partial<User>): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
     //Take all the properties from attrs and copy them directly to the user
     //overriding any properties that is already in the user object
@@ -55,7 +61,7 @@ export class UsersService {
   public async remove(id: number): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
     return this.repo.remove(user);
   }

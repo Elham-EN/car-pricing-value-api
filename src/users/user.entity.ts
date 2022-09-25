@@ -6,13 +6,21 @@ import {
   AfterUpdate,
   AfterRemove,
 } from 'typeorm';
+/**
+ * Exclude is decorator that is going to create a little set of rules
+ * that describe how to take an instance of a user and turn it into a
+ * plain object.
+ */
+//import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   public id: number;
+
   @Column()
   public email: string;
+
   @Column()
   public password: string;
 
