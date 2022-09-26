@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 //randomBytes - to generate a salt(give us a randon string of numbers & letters)
@@ -17,6 +21,7 @@ const scrypt = promisify(_scrypt);
 export class AuthService {
   public constructor(private userService: UsersService) {}
 
+  //Sign Up the user and store it's credential into the database
   public async signupUser(email: string, password: string): Promise<User> {
     //Check if email already exist
     const users = await this.userService.find(email);
@@ -41,7 +46,26 @@ export class AuthService {
     return user;
   }
 
-  public signinUser() {
-    return 1;
+  //Sign In User by verifyig User's email and password
+  public async signinUser(email: string, password: string): Promise<User> {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    //Split salt and hash by a period between them and this return an array of two
+    //elements, first element is the salt and the second element is the hash
+    const [salt, storedHash] = user.password.split('.');
+    //Rehash the supplied password from the user and the stored salt and take its
+    //output to make sure the output is identical to the hash we had stored in DB
+    const hash = (await scrypt(password, salt, 32)) as Buffer;
+    if (storedHash !== hash.toString('hex')) {
+      throw new BadRequestException('password incorrect');
+    }
+    return user;
   }
+
+  //Cookie - Hey this person is signed in and this person is not.
+  /**
+   * Cookie authentication uses HTTP cookies to authenticate client requests and maintain session information
+   */
 }

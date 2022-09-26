@@ -25,9 +25,16 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
+  @UseInterceptors(new SerializerInterceptor(UserDto))
   @Post('/signup')
   public createUser(@Body() body: CreateUserDto) {
     return this.authService.signupUser(body.email, body.password);
+  }
+
+  @UseInterceptors(new SerializerInterceptor(UserDto))
+  @Post('/signin')
+  public signin(@Body() body: CreateUserDto) {
+    return this.authService.signinUser(body.email, body.password);
   }
 
   //Nest is expecting id as a string and TypeORM is expecting id as a number

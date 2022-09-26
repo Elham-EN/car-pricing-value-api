@@ -33,6 +33,14 @@ export class UsersService {
     return user;
   }
 
+  public async findUserByEmail(email: string): Promise<User> {
+    const user = await this.repo.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   //Return a list of records/rows based on the query
   public find(email: string): Promise<User[]> {
     return this.repo.find({ where: { email } });
