@@ -66,6 +66,15 @@ export class AuthService {
 
   //Cookie - Hey this person is signed in and this person is not.
   /**
-   * Cookie authentication uses HTTP cookies to authenticate client requests and maintain session information
+   * Cookie authentication uses HTTP cookies to authenticate client requests and
+   * maintain session information.
+   *
+   * We use cookie to tie some information to the incoming requestm an outgoing
+   * response to store the ID of the user that this user just signed up to the
+   * application or signed in into our application
+   *
+   * More Information:
+   * https://www.section.io/engineering-education/cookie-vs-token-authentication/
+   * https://swagger.io/docs/specification/authentication/cookie-authentication/
    */
 }

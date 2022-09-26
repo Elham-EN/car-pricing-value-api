@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Query,
+  Session,
   //These tools we are going to use to intercept the outgoing response.
   UseInterceptors,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { AuthService } from './auth.service';
 //Custom Interceptor class
 import { SerializerInterceptor } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
+import { User } from './user.entity';
 
 @Controller('auth')
 export class UsersController {
@@ -26,15 +28,32 @@ export class UsersController {
   ) {}
 
   @UseInterceptors(new SerializerInterceptor(UserDto))
+  @Get('/whoami')
+  public whoAmI(@Session() session: any): Promise<User> {
+    return this.userService.findOne(session.userId);
+  }
+
+  @UseInterceptors(new SerializerInterceptor(UserDto))
   @Post('/signup')
-  public createUser(@Body() body: CreateUserDto) {
-    return this.authService.signupUser(body.email, body.password);
+  public async createUser(
+    @Body() body: CreateUserDto,
+    @Session() session: any,
+  ): Promise<User> {
+    const user = await this.authService.signupUser(body.email, body.password);
+    //Setup Session object by storing in user id
+    session.userId = user.id;
+    return user;
   }
 
   @UseInterceptors(new SerializerInterceptor(UserDto))
   @Post('/signin')
-  public signin(@Body() body: CreateUserDto) {
-    return this.authService.signinUser(body.email, body.password);
+  public async signin(
+    @Body() body: CreateUserDto,
+    @Session() session: any,
+  ): Promise<User> {
+    const user = await this.authService.signinUser(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
   //Nest is expecting id as a string and TypeORM is expecting id as a number
