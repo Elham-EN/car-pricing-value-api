@@ -21,17 +21,11 @@
  * the data to be returned to the client. For example, sensitive data like passwords
  * should always be excluded from the response.
  */
-import {
-  UseInterceptors,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { plainToClass } from 'class-transformer';
-import { UserDto } from 'src/users/dtos/user.dto';
 
 /**
  * Implements is not same as extends, we make use of extends whenever we are subclassing
@@ -58,6 +52,7 @@ import { UserDto } from 'src/users/dtos/user.dto';
  * UserDto class, which expose ID and Email but not the password
  */
 export class SerializerInterceptor implements NestInterceptor {
+  constructor(private dto: any) {}
   intercept(
     context: ExecutionContext,
     handler: CallHandler<any>,
@@ -75,7 +70,7 @@ export class SerializerInterceptor implements NestInterceptor {
         //console.log('Im running before the response is sent out', data);
         //data argument is the user entity instance and turn it into the instance
         //of user dto.
-        return plainToClass(UserDto, data, { excludeExtraneousValues: true });
+        return plainToClass(this.dto, data, { excludeExtraneousValues: true });
       }),
     );
   }
